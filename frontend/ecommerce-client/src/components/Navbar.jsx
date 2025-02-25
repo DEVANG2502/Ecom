@@ -1,11 +1,10 @@
-// src/components/Navbar.tsx
 import { motion } from "framer-motion";
 import { Search, Heart, ShoppingBag } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
   const navItems = ["New & Featured", "Men", "Women", "Sale"];
-  
+
   return (
     <motion.nav 
       initial={{ opacity: 0, y: -20 }}
@@ -33,26 +32,15 @@ const Navbar = () => {
           </div>
           
           <div className="flex items-center space-x-6">
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="text-gray-800 hover:text-black"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="text-gray-800 hover:text-black">
               <Search size={20} />
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="text-gray-800 hover:text-black"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="text-gray-800 hover:text-black">
               <Heart size={20} />
             </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              className="text-gray-800 hover:text-black"
-            >
+            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative text-gray-800 hover:text-black">
               <ShoppingBag size={20} />
+              
             </motion.button>
           </div>
         </div>
