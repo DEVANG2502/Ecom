@@ -1,38 +1,58 @@
-// import express from "express";
-// import Cart from "../models/Cart.js"; // Import Cart Model
+// src/context/CartContext.tsx
 
-// const router = express.Router();
+import React, { createContext, useState, useContext, useEffect } from "react";
+import axios from "axios";
 
-// // Add product to cart
-// router.post("/add", async (req, res) => {
-//   try {
-//     const { userId, productId, name, image, price, quantity } = req.body;
+// Define types for user and context
+interface User {
+  _id: string;
+  email: string;
+  // Add other user fields as needed
+}
 
-//     if (!userId || !productId) {
-//       return res.status(400).json({ message: "Missing required fields" });
-//     }
+interface CartContextType {
+  user: User | null;
+  setUser: React.Dispatch<React.SetStateAction<User | null>>;
+  isCartOpen: boolean;
+  setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-//     let cart = await Cart.findOne({ userId });
+// Create context
+const CartContext = createContext<CartContextType | undefined>(undefined);
 
-//     if (!cart) {
-//       cart = new Cart({ userId, products: [] });
-//     }
+// Export useCart hook
+export const useCart = () => {
+  const context = useContext(CartContext);
+  if (!context) {
+    throw new Error("useCart must be used within a CartProvider");
+  }
+  return context;
+};
 
-//     const existingProduct = cart.products.find((p) => p.productId === productId);
+// CartProvider component to provide context value
+export const CartProvider: React.FC = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
-//     if (existingProduct) {
-//       existingProduct.quantity += quantity;
-//     } else {
-//       cart.products.push({ productId, name, image, price, quantity });
-//     }
+  useEffect(() => {
+    // Fetch the user data on app load, for example, checking session or JWT token
+    const checkUserSession = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/auth/me", {
+          withCredentials: true,
+        });
+        setUser(res.data);
+      } catch (error) {
+        console.log("User not logged in", error);
+      }
+    };
 
-//     await cart.save();
-//     res.status(201).json({ message: "Product added to cart", cart });
-//   } catch (error) {
-//     console.error("Error adding to cart:", error);
-//     res.status(500).json({ message: "Server error" });
-//   }
-// });
+    checkUserSession();
+  }, []);
 
-// // ✅ Fix: Add this export at the end
-// export default router;
+  return (
+    <CartContext.Provider value={{ user, setUser, isCartOpen, setIsCartOpen }}>
+      {children}
+    </CartContext.Provider>
+  );
+};

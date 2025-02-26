@@ -1,23 +1,11 @@
 import express from "express";
-import Cart from "../models/Cart.js"; // Import Cart Model
+import { addToCart, getCartItems, removeFromCart, clearCart } from "../controllers/cartController.js";
 
 const router = express.Router();
-// Get cart items for a user
-router.get("/:userId", async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const cart = await Cart.findOne({ userId });
 
-    if (!cart) {
-      return res.status(404).json({ message: "Cart not found" });
-    }
+router.post("/add", addToCart);
+router.get("/:userId", getCartItems);
+router.delete("/remove/:cartItemId", removeFromCart);
+router.delete("/clear/:userId", clearCart);
 
-    res.status(200).json({ cart });
-  } catch (error) {
-    console.error("Error fetching cart:", error);
-    res.status(500).json({ message: "Server error" });
-  }
-});
-
-
-export default router;
+export default router; // ✅ Proper ES Module export

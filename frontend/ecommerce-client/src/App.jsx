@@ -8,11 +8,17 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Products from "./pages/Products";
 import NewArrivals from "./pages/Newarrivals";
-import Navbar from "./components/Navbar"; // Ensure Navbar is imported
 
+import Navbar from "./components/Navbar"; // Ensure Navbar is imported
+import Cart from "./pages/Cart";
+import CartPage from "./pages/CartPage";
 const queryClient = new QueryClient();
+import { CartProvider } from "./context/CartContext";
+
 
 const App = () => (
+  <CartProvider>
+
     <QueryClientProvider client={queryClient}>
       <Router>
         <TooltipProvider>
@@ -26,11 +32,16 @@ const App = () => (
             <Route path="/home" element={<LandingPage />} />
             <Route path="/products" element={<Products />} />
             <Route path="/newarrivals" element={<NewArrivals />} />
+            <Route path="/cart" element={<CartPage />} />
+
           </Routes>
           <Products/>
+          <Cart/>
         </TooltipProvider>
       </Router>
     </QueryClientProvider>
+    </CartProvider>
+
 );
 
 export default App;

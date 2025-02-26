@@ -1,51 +1,60 @@
-import { motion } from "framer-motion";
-import { Search, Heart, ShoppingBag } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ShoppingBag } from "lucide-react";
+import { useCart } from "../context/CartContext"; // Ensure this is the correct path for your context
+import axios from "axios";
 import { Link } from "react-router-dom";
 
 const Navbar = () => {
-  const navItems = ["New & Featured", "Men", "Women", "Sale"];
+  const { user, setIsCartOpen } = useCart();
+  const [cartCount, setCartCount] = useState(0);
+
+  useEffect(() => {
+    // Fetch cart items when the user is logged in
+    const fetchCartCount = async () => {
+      if (user && user._id) {
+        try {
+          const res = await axios.get(`http://localhost:5000/api/cart/${user._id}`, {
+            withCredentials: true, // Send cookies with the request
+          });
+
+          setCartCount(res.data.items.length); // Set the number of items in the cart
+        } catch (error) {
+          console.error("Error fetching cart count:", error);
+          setCartCount(0);
+        }
+      }
+    };
+
+    fetchCartCount();
+  }, [user]);
 
   return (
-    <motion.nav 
-      initial={{ opacity: 0, y: -20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
-    >
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
-          <Link to="/" className="text-2xl font-light tracking-tighter">
-            TrendTrunk.
-          </Link>
-          
-          <div className="hidden md:flex space-x-8">
-            {navItems.map((item) => (
-              <motion.a
-                key={item}
-                href="#"
-                className="text-gray-800 hover:text-black transition-colors duration-200"
-                whileHover={{ y: -2 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {item}
-              </motion.a>
-            ))}
-          </div>
-          
-          <div className="flex items-center space-x-6">
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="text-gray-800 hover:text-black">
-              <Search size={20} />
-            </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="text-gray-800 hover:text-black">
-              <Heart size={20} />
-            </motion.button>
-            <motion.button whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative text-gray-800 hover:text-black">
-              <ShoppingBag size={20} />
-              
-            </motion.button>
-          </div>
+    <nav className="bg-white p-4 shadow-md flex justify-between items-center">
+      <div className="text-lg font-bold">The Shoe Factory</div>
+
+      <div className="flex items-center gap-6">
+        {/* Other navbar items */}
+
+        <div
+          className="relative cursor-pointer"
+          onClick={() => setIsCartOpen(true)} // Open the cart when clicked
+        >
+          <ShoppingBag className="w-6 h-6" />
+          {cartCount > 0 && (
+            <span className="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full px-1">
+              {cartCount}
+            </span>
+          )}
         </div>
+
+        {/* Link to Cart page */}
+        {user && (
+          <Link to="/cart" className="text-sm text-gray-600 hover:text-gray-800">
+            Go to Cart
+          </Link>
+        )}
       </div>
-    </motion.nav>
+    </nav>
   );
 };
 
