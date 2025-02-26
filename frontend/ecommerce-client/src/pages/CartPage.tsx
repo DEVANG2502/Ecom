@@ -1,110 +1,163 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-interface CartItem {
-  _id: string;
-  name: string;
-  price: number;
-  quantity: number;
-  image: string;
-}
-
 const CartPage = () => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  const [cartItems, setCartItems] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const navigate = useNavigate();
 
+  const navigate = useNavigate();
+  const dummyUserId = "67beb3a1f853270d165d6f87"; // Replace with the actual user ID
+
+  // Fetch cart items when the component loads
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchCartItems = async () => {
       try {
-        // Replace 'yourUserId' with the actual user ID
-        const res = await axios.get("http://localhost:5000/api/cart/yourUserId", {
-          withCredentials: true,
-        });
+        const res = await axios.get(`http://localhost:5000/api/cart/${dummyUserId}`);
         setCartItems(res.data.items);
-      } catch (error) {
-        console.error("Error fetching cart items:", error);
+      } catch (err) {
+        console.error("Error fetching cart items:", err);
         setError("Failed to load cart items.");
       } finally {
         setLoading(false);
       }
     };
-
-    fetchCart();
+    fetchCartItems();
   }, []);
 
-  const handleRemoveItem = async (itemId: string) => {
+  const totalPrice = cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+
+  // Update cart state after adding an item to the cart
+  const addToCart = async (productId: string, name: string, image: string, price: number, quantity: number) => {
     try {
-      await axios.delete(`http://localhost:5000/api/cart/remove/${itemId}`, {
-        withCredentials: true,
+      await axios.post("http://localhost:5000/api/cart/add", {
+        userId: dummyUserId,
+        productId,
+        name,
+        image,
+        price,
+        quantity,
       });
-      setCartItems(cartItems.filter((item) => item._id !== itemId)); // Remove item from state
-    } catch (error) {
-      console.error("Error removing item:", error);
-      alert("Failed to remove item from cart.");
+
+      // Directly update the state after adding the item to the cart
+      setCartItems(prevItems => [
+        ...prevItems,
+        { productId, name, image, price, quantity }
+      ]);
+    } catch (err) {
+      console.error("Error adding item to cart:", err);
+      setError("Failed to add item to cart.");
     }
   };
 
-  const handleCheckout = () => {
-    navigate("/checkout"); // Redirect to checkout page (replace with your actual checkout route)
+  // Remove item from cart
+  const removeItem = async (cartItemId: string) => {
+    try {
+      await axios.delete(`http://localhost:5000/api/cart/remove/${cartItemId}`);
+
+      // Remove the item from state directly after deleting
+      setCartItems(prevItems => prevItems.filter(item => item._id !== cartItemId));
+    } catch (err) {
+      console.error("Error removing item:", err);
+      setError("Failed to remove item.");
+    }
+  };
+
+  // Increase item quantity
+  const increaseQuantity = async (cartItemId: string) => {
+    try {
+      await axios.put(`http://localhost:5000/api/cart/increase/${cartItemId}`);
+
+      // Update quantity in state without fetching the whole cart again
+      setCartItems(prevItems =>
+        prevItems.map(item =>
+          item._id === cartItemId ? { ...item, quantity: item.quantity + 1 } : item
+        )
+      );
+    } catch (err) {
+      console.error("Error increasing quantity:", err);
+      setError("Failed to increase quantity.");
+    }
+  };
+
+  // Decrease item quantity
+  const decreaseQuantity = async (cartItemId: string) => {
+    try {
+      await axios.put(`http://localhost:5000/api/cart/decrease/${cartItemId}`);
+
+      // Update quantity in state without fetching the whole cart again
+      setCartItems(prevItems =>
+        prevItems.map(item =>
+          item._id === cartItemId ? { ...item, quantity: item.quantity - 1 } : item
+        )
+      );
+    } catch (err) {
+      console.error("Error decreasing quantity:", err);
+      setError("Failed to decrease quantity.");
+    }
+  };
+
+  // Checkout - Navigate to Payment Page
+  const checkout = () => {
+    navigate("/payment");
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold text-center mb-6">Your Cart</h1>
-
+        <h1 className="text-4xl font-bold mb-8">Your Cart</h1>
+        
         {loading ? (
-          <div className="text-center text-gray-500">Loading cart...</div>
+          <p>Loading cart...</p>
         ) : error ? (
-          <div className="text-center text-red-500">{error}</div>
+          <p className="text-red-500">{error}</p>
         ) : cartItems.length === 0 ? (
-          <div className="text-center text-gray-500">Your cart is empty!</div>
+          <p>Your cart is empty.</p>
         ) : (
           <div>
-            <div className="space-y-6">
-              {cartItems.map((item) => (
-                <div
-                  key={item._id}
-                  className="flex items-center justify-between bg-white shadow-md rounded-lg p-6"
-                >
-                  <div className="flex items-center">
-                    <img
-                      src={`http://localhost:5000/images/${item.image}`}
-                      alt={item.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-                    <div className="ml-6">
-                      <h3 className="text-xl font-semibold">{item.name}</h3>
-                      <p className="text-gray-500">Quantity: {item.quantity}</p>
+            {cartItems.map((item: any) => (
+              <div key={item._id} className="flex justify-between items-center py-4 border-b">
+                <div className="flex items-center">
+                <img
+  src={`http://localhost:5000/images${item.image}`}
+  alt={item.name}
+  className="w-24 h-24 object-cover mr-4"
+/>
+
+                  <div>
+                    <h3 className="text-xl font-semibold">{item.name}</h3>
+                    <p className="text-gray-500">£{item.price.toFixed(2)}</p>
+                    <p className="text-gray-500">Quantity: {item.quantity}</p>
+                    <div className="flex items-center mt-2 space-x-2">
+                      <button
+                        className="bg-green-500 text-white py-1 px-4 rounded-full hover:bg-green-400"
+                        onClick={() => increaseQuantity(item._id)}
+                      >
+                        Increase
+                      </button>
+                      <button
+                        className="bg-yellow-500 text-white py-1 px-4 rounded-full hover:bg-yellow-400"
+                        onClick={() => decreaseQuantity(item._id)}
+                      >
+                        Decrease
+                      </button>
+                      <button
+                        className="bg-red-500 text-white py-1 px-4 rounded-full hover:bg-red-400"
+                        onClick={() => removeItem(item._id)}
+                      >
+                        Remove
+                      </button>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <p className="text-xl font-semibold text-[#F97316]">
-                      £{(item.price * item.quantity).toFixed(2)}
-                    </p>
-                    <button
-                      onClick={() => handleRemoveItem(item._id)}
-                      className="ml-4 text-red-500 hover:text-red-700 transition"
-                    >
-                      Remove
-                    </button>
-                  </div>
                 </div>
-              ))}
-            </div>
-
-            <div className="mt-8 flex justify-between items-center">
-              <div className="text-xl font-semibold">
-                Total: £
-                {cartItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}
               </div>
-              <button
-                onClick={handleCheckout}
-                className="bg-[#F97316] text-white py-2 px-6 rounded-full hover:bg-[#e46306] transition-all"
-              >
+            ))}
+            <div className="flex justify-between items-center mt-6">
+              <h2 className="text-2xl font-semibold">
+                Total Price: £{totalPrice.toFixed(2)}
+              </h2>
+              <button className="bg-[#F97316] text-white py-2 px-4 rounded-full hover:bg-[#e46306]" onClick={checkout}>
                 Checkout
               </button>
             </div>

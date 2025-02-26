@@ -15,7 +15,6 @@ import CartPage from "./pages/CartPage";
 const queryClient = new QueryClient();
 import { CartProvider } from "./context/CartContext";
 
-
 const App = () => (
   <CartProvider>
 

@@ -5,7 +5,7 @@ export const addToCart = async (req, res) => {
   const { userId, productId, name, image, price, quantity } = req.body;
 
   try {
-    // Find the user's cart, or create one if it doesn't exist
+    // Find the user's cart, or create one if it doesn't existzz
     let cart = await Cart.findOne({ userId });
     if (!cart) {
       cart = new Cart({ userId, items: [] });
@@ -89,5 +89,51 @@ export const clearCart = async (req, res) => {
   } catch (error) {
     console.error("Error clearing cart:", error);
     return res.status(500).json({ message: "Failed to clear the cart." });
+  }
+};
+
+// Increase quantity of an item in the cart
+export const increaseQuantity = async (req, res) => {
+  const { cartItemId } = req.params;
+
+  try {
+    // Find the cart item and update the quantity
+    const cart = await Cart.findOneAndUpdate(
+      { "items._id": cartItemId },
+      { $inc: { "items.$.quantity": 1 } },
+      { new: true }
+    );
+
+    if (!cart) {
+      return res.status(404).json({ message: "Item not found in cart." });
+    }
+
+    return res.status(200).json({ message: "Item quantity increased." });
+  } catch (error) {
+    console.error("Error increasing item quantity:", error);
+    return res.status(500).json({ message: "Failed to increase item quantity." });
+  }
+};
+
+// Decrease quantity of an item in the cart
+export const decreaseQuantity = async (req, res) => {
+  const { cartItemId } = req.params;
+
+  try {
+    // Find the cart item and decrease the quantity if it's greater than 1
+    const cart = await Cart.findOneAndUpdate(
+      { "items._id": cartItemId, "items.quantity": { $gt: 1 } },
+      { $inc: { "items.$.quantity": -1 } },
+      { new: true }
+    );
+
+    if (!cart) {
+      return res.status(404).json({ message: "Item not found in cart or quantity is already 1." });
+    }
+
+    return res.status(200).json({ message: "Item quantity decreased." });
+  } catch (error) {
+    console.error("Error decreasing item quantity:", error);
+    return res.status(500).json({ message: "Failed to decrease item quantity." });
   }
 };

@@ -25,7 +25,7 @@ app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(cookieParser());
 
 // ✅ Serve Static Files (Ensure "public/images" exists)
-app.use("/images", express.static(path.join(__dirname, "public", "images")));
+app.use("/images", express.static(path.join(__dirname, "public/images")));
 
 // Routes
 app.use("/api/auth", authRoutes);

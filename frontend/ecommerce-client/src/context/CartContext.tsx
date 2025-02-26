@@ -1,57 +1,79 @@
 // src/context/CartContext.tsx
+import React, { createContext, useContext, useState } from 'react';
 
-import React, { createContext, useState, useContext, useEffect } from "react";
-import axios from "axios";
-
-// Define types for user and context
-interface User {
+interface CartItem {
   _id: string;
-  email: string;
-  // Add other user fields as needed
+  name: string;
+  price: number;
+  quantity: number;
+  image: string;
 }
 
 interface CartContextType {
-  user: User | null;
-  setUser: React.Dispatch<React.SetStateAction<User | null>>;
-  isCartOpen: boolean;
-  setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  cartItems: CartItem[];
+  addItemToCart: (item: CartItem) => void;
+  removeItemFromCart: (id: string) => void;
+  increaseQuantity: (id: string) => void;
+  decreaseQuantity: (id: string) => void;
 }
 
-// Create context
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// Export useCart hook
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) {
-    throw new Error("useCart must be used within a CartProvider");
+    throw new Error('useCart must be used within a CartProvider');
   }
   return context;
 };
 
-// CartProvider component to provide context value
 export const CartProvider: React.FC = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
+  const [cartItems, setCartItems] = useState<CartItem[]>([]);
 
-  useEffect(() => {
-    // Fetch the user data on app load, for example, checking session or JWT token
-    const checkUserSession = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/auth/me", {
-          withCredentials: true,
-        });
-        setUser(res.data);
-      } catch (error) {
-        console.log("User not logged in", error);
+  const addItemToCart = (item: CartItem) => {
+    setCartItems((prevItems) => {
+      const existingItem = prevItems.find((i) => i._id === item._id);
+      if (existingItem) {
+        return prevItems.map((i) =>
+          i._id === item._id ? { ...i, quantity: i.quantity + 1 } : i
+        );
       }
-    };
+      return [...prevItems, { ...item, quantity: 1 }];
+    });
+  };
 
-    checkUserSession();
-  }, []);
+  const removeItemFromCart = (id: string) => {
+    setCartItems((prevItems) => prevItems.filter((item) => item._id !== id));
+  };
+
+  const increaseQuantity = (id: string) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === id ? { ...item, quantity: item.quantity + 1 } : item
+      )
+    );
+  };
+
+  const decreaseQuantity = (id: string) => {
+    setCartItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === id && item.quantity > 1
+          ? { ...item, quantity: item.quantity - 1 }
+          : item
+      )
+    );
+  };
 
   return (
-    <CartContext.Provider value={{ user, setUser, isCartOpen, setIsCartOpen }}>
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addItemToCart,
+        removeItemFromCart,
+        increaseQuantity,
+        decreaseQuantity,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );

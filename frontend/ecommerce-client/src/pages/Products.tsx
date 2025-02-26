@@ -64,21 +64,26 @@ const Products = () => {
     };
 
     try {
-      console.log("🛒 Sending data to backend:", payload);
       const res = await axios.post("http://localhost:5000/api/cart/add", payload, {
         withCredentials: true,
       });
 
-      if (res.status === 200 || res.status === 201) {
+      if (res.status === 201) {
         alert("✅ Product added to cart successfully!");
+
+        // Optimistically update the state by adding the product to the products list directly
+        setProducts((prevProducts) => [
+          ...prevProducts,
+          { ...product, quantity: 1 }, // You can add a `quantity` property if needed
+        ]);
+
         // Redirect to the Cart page after adding the product
         navigate("/cart");
       } else {
         alert("❌ Failed to add product to cart.");
       }
-    } catch (error: any) {
-      console.error("❌ Error adding to cart:", error.response?.data || error);
-      alert(error.response?.data?.message || "Failed to add product to cart.");
+    } catch (error) {
+      alert("❌ Error adding to cart.");
     }
   };
 
