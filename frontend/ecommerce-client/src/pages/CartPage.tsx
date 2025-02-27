@@ -100,7 +100,7 @@ const CartPage = () => {
 
   // Checkout - Navigate to Payment Page
   const checkout = () => {
-    navigate("/payment");
+    navigate("/paymentt");
   };
 
   return (

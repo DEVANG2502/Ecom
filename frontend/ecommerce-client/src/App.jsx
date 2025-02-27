@@ -1,46 +1,75 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import ToasterComponent from "./components/ui/toaster";
-import SonnerComponent from "./components/ui/sonner";
-import { TooltipProvider } from "./components/ui/tooltip";
+import { useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
-import Products from "./pages/Products";
-import NewArrivals from "./pages/Newarrivals";
-
-import Navbar from "./components/Navbar"; // Ensure Navbar is imported
-import Cart from "./pages/Cart";
+// import Products from "./pages/Products";
+// import NewArrivals from "./pages/NewArrivals";
 import CartPage from "./pages/CartPage";
-const queryClient = new QueryClient();
+import PaymentPage from "./pages/PaymentPage";
+import Navbar from "./pages/Navbar";
 import { CartProvider } from "./context/CartContext";
+import PaymentForm from "./pages/PaymentForm";
+// import Navbar from "./pages/Navbar";
+import PaymentPagee from "./pages/PaymentPagee";
 
-const App = () => (
-  <CartProvider>
 
-    <QueryClientProvider client={queryClient}>
+//
+import SuccessPage from "./pages/SuccessPage";
+
+
+// ✅ Protected Route Component
+const ProtectedRoute = ({ element }) => {
+  const token = localStorage.getItem("token");
+  return token ? element : <Navigate to="/login" />;
+};
+
+// ✅ Add PropTypes validation to avoid missing prop errors
+ProtectedRoute.propTypes = {
+  element: PropTypes.element.isRequired,
+};
+
+const App = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem("token"));
+
+  // ✅ Update state when token changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      setIsLoggedIn(!!localStorage.getItem("token"));
+    };
+
+    window.addEventListener("storage", handleStorageChange);
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
+
+  return (
+    <CartProvider>
       <Router>
-        <TooltipProvider>
-          <ToasterComponent />
-          <SonnerComponent />
-          <Navbar /> {/* Navbar added to reflect cart count */}
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/signup" element={<Signup />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/home" element={<LandingPage />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/newarrivals" element={<NewArrivals />} />
-            <Route path="/cart" element={<CartPage />} />
+        {isLoggedIn && <Navbar />}
+        
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/" element={<ProtectedRoute element={<LandingPage />} />} />
+          <Route path="/cart" element={<ProtectedRoute element={<CartPage />} />} />
+          <Route path="/payment" element={<ProtectedRoute element={<PaymentPage />} />} />
+          <Route path="/payment-form" element={<ProtectedRoute element={<PaymentForm />} />} />
+          <Route path="/paymentt" element={<ProtectedRoute element={<PaymentPagee />} />} />
+        </Routes>
+        
 
-          </Routes>
-          <Products/>
-          <Cart/>
-        </TooltipProvider>
+        {/* {isLoggedIn && (
+          <>
+            <Products />
+            <NewArrivals />
+          </>
+        )} */}
+        
       </Router>
-    </QueryClientProvider>
     </CartProvider>
-
-);
+    
+  );
+};
 
 export default App;

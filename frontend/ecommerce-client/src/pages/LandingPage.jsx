@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
-import Navbar from "../components/Navbar";
+import Navbar from "./Navbar";
 
+import NewArrivals from "./NewArrivals";
+import Products from "./Products";
 const LandingPage = () => {
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
@@ -105,7 +108,16 @@ const LandingPage = () => {
           </section>
         </div>
       </main>
+      <div>
+      <>
+            <Products />
+            <NewArrivals />
+            <Navbar/>
+          </>
+      </div>
     </div>
+    
+     
   );
 };
 

@@ -13,65 +13,67 @@ const newArrivals: Product[] = [
     name: "Jordan 1 Mid Kids",
     colors: "1 Colour",
     price: 64.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj1.jpg",
   },
   {
     id: 2,
     name: "Nike Dunk Low Retro",
     colors: "1 Colour",
     price: 109.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj2.jpg",
   },
   {
     id: 3,
     name: "Jordan 1 Mid SE Kids",
     colors: "1 Colour",
     price: 64.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj3.jpg",
   },
   {
     id: 4,
     name: "Nike Air Max 1 SC",
     colors: "1 Colour",
     price: 89.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj4.jpg",
   },
   {
     id: 5,
     name: "Nike Air Max",
     colors: "1 Colour",
     price: 139.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj5.jpg",
   },
   {
     id: 6,
     name: "Nike InfinityRN 4",
     colors: "7 Colours",
     price: 109.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj6.jpg",
   },
   {
     id: 7,
     name: "Sabrina 1 'Ionic'",
     colors: "1 Colour",
     price: 119.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj7.jpg",
   },
   {
     id: 8,
     name: "Nike Dunk Low",
     colors: "1 Colour",
     price: 109.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj8.jpg",
   },
   {
     id: 9,
     name: "Nike Metcon 9 AMP",
     colors: "1 Colour",
     price: 139.95,
-    image: "/lovable-uploads/d41e8a04-b1e2-456b-8a33-a24a71368f89.png",
+    image: "/images/AJ/aj9.jpg",
   },
 ];
+
+
 const NewArrivals = () => {
   const [hoveredProduct, setHoveredProduct] = useState<number | null>(null);
   return (

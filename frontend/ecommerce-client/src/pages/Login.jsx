@@ -12,9 +12,15 @@ const Login = () => {
     e.preventDefault();
     try {
       const { data } = await axios.post("http://localhost:5000/api/auth/login", { email, password });
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      alert("Login Successful!");
-      navigate("/");
+  
+      if (data?.token) {
+        localStorage.setItem("token", data.token); // ✅ Store token instead of userInfo
+        alert("Login Successful!");
+        navigate("/"); // ✅ Redirect to Landing Page
+        window.location.reload(); // ✅ Ensure re-render of App.jsx
+      } else {
+        alert("Invalid response from server");
+      }
     } catch (error) {
       alert("Error: " + (error.response?.data?.message || error.message));
     }
