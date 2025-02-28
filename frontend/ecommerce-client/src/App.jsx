@@ -15,8 +15,7 @@ import PaymentForm from "./pages/PaymentForm";
 import PaymentPagee from "./pages/PaymentPagee";
 
 
-//
-import SuccessPage from "./pages/SuccessPage";
+import OrdersPage from "./pages/OrdersPage";
 
 
 // ✅ Protected Route Component
@@ -56,6 +55,7 @@ const App = () => {
           <Route path="/payment" element={<ProtectedRoute element={<PaymentPage />} />} />
           <Route path="/payment-form" element={<ProtectedRoute element={<PaymentForm />} />} />
           <Route path="/paymentt" element={<ProtectedRoute element={<PaymentPagee />} />} />
+          <Route path="/orders" element={<ProtectedRoute element={<OrdersPage />} />} />
         </Routes>
         
 

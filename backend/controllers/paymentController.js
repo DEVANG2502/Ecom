@@ -13,10 +13,11 @@ export const createPaymentIntent = async (req, res) => {
       return res.status(400).json({ error: "Invalid payment details" });
     }
 
+    // Update payment_method_types to only 'card'
     const paymentIntent = await stripe.paymentIntents.create({
       amount,
       currency,
-      payment_method_types: [paymentMethodType],
+      payment_method_types: ["card"], // Only 'card' is used for now
     });
 
     res.json({ clientSecret: paymentIntent.client_secret });
@@ -24,3 +25,4 @@ export const createPaymentIntent = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
+

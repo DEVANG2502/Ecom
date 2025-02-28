@@ -120,7 +120,7 @@ const CartPage = () => {
               <div key={item._id} className="flex justify-between items-center py-4 border-b">
                 <div className="flex items-center">
                 <img
-  src={`http://localhost:5000/images${item.image}`}
+  src={item.image}
   alt={item.name}
   className="w-24 h-24 object-cover mr-4"
 />

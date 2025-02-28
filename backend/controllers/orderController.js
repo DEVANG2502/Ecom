@@ -1,24 +1,35 @@
 import Order from "../models/orderModel.js";
+import Cart from "../models/Cart.js";
 
 // Place Order
 export const placeOrder = async (req, res) => {
   try {
-    const { userId, cartItems, totalAmount, paymentMethod, paymentStatus } = req.body;
+    const { userId, paymentMethod, paymentStatus, totalAmount } = req.body;
 
-    if (!userId || !cartItems || cartItems.length === 0 || !totalAmount || !paymentMethod) {
+    if (!paymentMethod) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    const cart = await Cart.findOne({ userId: userId });
+    if (!cart) {
+      return res.status(400).json({ message: "No items in your cart" });
+    }
+    console.log(cart);
+    const totalPrice = cart.items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const { items } = cart;
+
     const newOrder = new Order({
       userId,
-      cartItems,
-      totalAmount,
+      cartItems: items,
+      totalAmount: totalPrice,
       paymentMethod,
       paymentStatus, // "Paid" or "Pending" (for COD)
       orderStatus: "Processing",
     });
 
     await newOrder.save();
+
+    await cart.deleteOne({ userId: userId });
 
     res.status(201).json({ message: "Order placed successfully!", order: newOrder });
   } catch (error) {
